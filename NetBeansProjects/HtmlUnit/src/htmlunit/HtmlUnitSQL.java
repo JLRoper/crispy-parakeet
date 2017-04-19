@@ -42,7 +42,7 @@ public class HtmlUnitSQL {
             System.out.println("Creating statement...");
             stmt = conn.createStatement();
             String sql;
-            sql = "SELECT personid, firstname, l aastname, address FROM PERSONS";
+            sql = "SELECT personid, firstname, lastname, address FROM PERSONS";
             ResultSet rs = stmt.executeQuery(sql);
 
             //STEP 5: Extract data from result set
