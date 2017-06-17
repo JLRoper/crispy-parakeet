@@ -18,15 +18,29 @@ public class QuoteList extends AbstractList<QuoteBean> {
     String symbol;
     List<QuoteBean> list;
 
-    public QuoteList() {
+    public QuoteList(String symbol) {
+        this.symbol = symbol;
         list = new ArrayList<>();
+    }
+
+
+    public String getSymbol() {
+        return this.symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public boolean addQuote(QuoteBean quote) {
+        return add(quote);
     }
 
     @Override
     public boolean add(QuoteBean bean) {
         if (symbol == null) {
-            symbol = bean.getTicker();
-        } else if (!bean.getTicker().equals(symbol)) {
+            symbol = bean.getSymbol();
+        } else if (!bean.getSymbol().equals(symbol)) {
             throw new RuntimeException("Tried to add quote to a quote list for a different company");
         }
         return list.add(bean);

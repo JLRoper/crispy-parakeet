@@ -9,7 +9,6 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -46,56 +46,53 @@ public enum QuoteHandler {
     }
 
     public Map<String, QuoteList> parseYQSResponse(String xml) throws Exception {
-        DEBUG_PRINT(xml);
-
-        InputSource inStream = new InputSource();
-        inStream.setCharacterStream(new StringReader(xml));
-
-        DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = dBuilder.parse(inStream);
-
-        NodeList nodes = doc.getElementsByTagName("quote");
         Map<String, QuoteList> symbolMap = new HashMap<>();
-        QuoteList quoteList = new QuoteList();
-
+        QuoteList quoteList;
+        QuoteBean currentQuote;
+        Element quoteElement;
         String sym, time;
-        String prevSym = "";
         Double price;
         int vol;
-        Element quoteElement;
+
         int countQuote = 0;
+        NodeList nodes = selectNodesFromXML(xml, "quote");
         while (nodes.item(countQuote) != null) {
-            quoteElement = (Element) nodes.item(countQuote);
 
+            /* Extract a single quote element from XML. */
+            quoteElement = (Element) nodes.item(countQuote++);
+
+            /* Create new QuoteBean from data in quote element. */
             sym = getStringDataFromTag(quoteElement, "Symbol");
-            if(!prevSym.equals(sym)){
-                quoteList = new QuoteList();
-            }
-                
-            
             price = Double.parseDouble(getStringDataFromTag(quoteElement, "LastTradePriceOnly"));
-            vol = Integer.parseInt(getStringDataFromTag(quoteElement, "LastTradePriceOnly"));
+            vol = Integer.parseInt(getStringDataFromTag(quoteElement, "Volume"));
+            currentQuote = new QuoteBean(sym, "", price, vol);
 
-            quoteList.add(new QuoteBean("", "", price, vol));
-
-            countQuote++;
+            /* Add new QuoteBean to the appropriate QuoteList. */
+            quoteList = symbolMap.get(currentQuote.getSymbol());
+            if (quoteList == null) {
+                quoteList = new QuoteList(currentQuote.getSymbol());
+                symbolMap.put(currentQuote.getSymbol(), quoteList);
+            }
+            quoteList.addQuote(currentQuote);
         }
 
         return symbolMap;
     }
 
+    private NodeList selectNodesFromXML(String xml, String elementTag) throws Exception {
+        DEBUG_PRINT("XML in: " + xml);
+        NodeList nodes = null;
+        InputSource inStream = new InputSource();
+        inStream.setCharacterStream(new StringReader(xml));
+        DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = dBuilder.parse(inStream);
+        nodes = doc.getElementsByTagName(elementTag);
+        return nodes;
+    }
+
     private static String getStringDataFromTag(Element e, String tagName) {
         Element tagEl = (Element) e.getElementsByTagName(tagName).item(0);
         Node child = tagEl.getFirstChild();
-        if (child instanceof CharacterData) {
-            CharacterData cd = (CharacterData) child;
-            return cd.getData().trim();
-        }
-        return "";
-    }
-
-    private static String getStringDataFromSingleElement(Element e) {
-        Node child = e.getFirstChild();
         if (child instanceof CharacterData) {
             CharacterData cd = (CharacterData) child;
             return cd.getData().trim();
