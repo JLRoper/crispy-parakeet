@@ -20,7 +20,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -39,6 +38,12 @@ public enum QuoteHandler {
             page = webClient.getPage(URL);
 
             Map<String, QuoteList> quoteData = parseYQSResponse(page.asXml());
+
+            QuoteList quoteList;
+            for (String key : quoteData.keySet()) {
+                quoteList = quoteData.get(key);
+                System.out.println(quoteList.toString());
+            }
 
         } catch (Exception ex) {
             Logger.getLogger(HtmlUnit.class.getName()).log(Level.SEVERE, null, ex);
@@ -65,7 +70,7 @@ public enum QuoteHandler {
             sym = getStringDataFromTag(quoteElement, "Symbol");
             price = Double.parseDouble(getStringDataFromTag(quoteElement, "LastTradePriceOnly"));
             vol = Integer.parseInt(getStringDataFromTag(quoteElement, "Volume"));
-            currentQuote = new QuoteBean(sym, "", price, vol);
+            currentQuote = new QuoteBean(sym, DatabaseConnector.INSTANCE.getFormattedTimestamp(), price, vol);
 
             /* Add new QuoteBean to the appropriate QuoteList. */
             quoteList = symbolMap.get(currentQuote.getSymbol());
@@ -104,7 +109,7 @@ public enum QuoteHandler {
         String url = "";
         ticker = ticker.toUpperCase();
         url = "https://query.yahooapis.com/v1/public/yql?q="
-                + "select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22" + ticker + "%22)"
+                + "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22" + ticker + "%22)"
                 //                + "&diagnostics=true"
                 + "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
         return url;

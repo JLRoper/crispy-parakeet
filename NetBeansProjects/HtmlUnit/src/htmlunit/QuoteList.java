@@ -23,7 +23,6 @@ public class QuoteList extends AbstractList<QuoteBean> {
         list = new ArrayList<>();
     }
 
-
     public String getSymbol() {
         return this.symbol;
     }
@@ -54,6 +53,15 @@ public class QuoteList extends AbstractList<QuoteBean> {
     @Override
     public int size() {
         return list.size();
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for (QuoteBean bean : list) {
+            str += bean.toString() + "\n";
+        }
+        return str;
     }
 
     @Override

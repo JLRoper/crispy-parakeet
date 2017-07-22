@@ -29,83 +29,8 @@ import org.xml.sax.InputSource;
  */
 public class HtmlUnit {
 
-    /**
-     * @param args the command line arguments
-     */
-//    public static void main(String[] args) throws Exception {
-//        // TODO code application logic here
-//        final XmlPage page;
-//        String URL = new HtmlUnit().buildYQSStockURL("X");
-//
-//        try (final WebClient webClient = new WebClient()) {
-//            page = webClient.getPage(URL);
-////            System.out.println(page.getTitleText());
-//            System.out.println(page.asXml());
-//
-//            new HtmlUnit().getFieldFromXML("Symbol", page.asXml());
-//
-//        } catch (IOException | FailingHttpStatusCodeException | ParserConfigurationException ex) {
-//            Logger.getLogger(HtmlUnit.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-//
     public static void main(String arg[]) throws Exception {
-
-//        QuoteBean bean1 = new QuoteBean("TST", "20170415223701", 12.34, 12456);
-//        QuoteBean bean2 = new QuoteBean("TST", "20170415223702", 12.24, 123456);
-//        QuoteBean bean3 = new QuoteBean("TST", "20170415223703", 12.26, 1234);
-//        QuoteBean bean4 = new QuoteBean("TST", "20170415223704", 12.30, 12356);
-//
-//        QuoteList quotes = new QuoteList();
-//        quotes.add(bean3);
-//        quotes.add(bean2);
-//        quotes.add(bean4);
-//        quotes.add(bean1);
-//        System.out.println(quotes.toString());
-//        Comparator<QuoteBean> comp = new Comparator<QuoteBean>() {
-//            @Override
-//            public int compare(QuoteBean o1, QuoteBean o2) {
-//                return o1.compareTo(o2); //To change body of generated methods, choose Tools | Templates.
-//            }
-//        };
-//        quotes.sort(comp);
-//
-//        System.out.println(quotes.toString());
-        QuoteHandler.INSTANCE.retreiveCurrentQuote("AMD");
-////                TODO code application logic here
-//        final XmlPage page;
-//        String URL = new HtmlUnit().buildYQSStockURL("AMD");
-//
-//        try (final WebClient webClient = new WebClient()) {
-//            page = webClient.getPage(URL);
-//
-//            System.out.println(page.asXml());
-//
-//            new HtmlUnit().getFieldFromXML("Symbol", page.asXml());
-//
-//        } catch (IOException | FailingHttpStatusCodeException | ParserConfigurationException ex) {
-//            Logger.getLogger(HtmlUnit.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        String xmlRecords = "<data><employee><name>A</name>"
-//                + "<title>Manager</title></employee></data>";
-//        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//        InputSource is = new InputSource();
-//        is.setCharacterStream(new StringReader(xmlRecords));
-//
-//        Document doc = db.parse(is);
-//        NodeList nodes = doc.getElementsByTagName("employee");
-//
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//            Element element = (Element) nodes.item(i);
-//
-//            NodeList name = element.getElementsByTagName("name");
-//            Element line = (Element) name.item(0);
-//            System.out.println("Name: " + getCharacterDataFromElement(line));
-//
-//            NodeList title = element.getElementsByTagName("title");
-//            line = (Element) title.item(0);
-//            System.out.println("Title: " + getCharacterDataFromElement(line));
-//        }
+        QuoteHandler.INSTANCE.retreiveCurrentQuote("MU");
     }
 
     public String buildYQSStockURL(String ticker) {

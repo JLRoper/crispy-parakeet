@@ -10,39 +10,48 @@ package htmlunit;
  * @author Jacob
  */
 public class QuoteBean implements Comparable<QuoteBean> {
-    
-        private final String symbol;
-        private final String time;
-        private final double price;
-        private final int volume;
 
-        public QuoteBean(final String ticker, final String time, final double price, final int volume) {
-            this.symbol = ticker;
-            this.time = time;
-            this.price = price;
-            this.volume = volume;
-        }
+    private final String symbol;
+    private final String time;
+    private final double price;
+    private final int volume;
 
-        @Override
-        public int compareTo(QuoteBean o) {
-            return this.time.compareTo(o.getTime());
+    public QuoteBean(final String ticker, final String time, final double price, final int volume) {
+        this.symbol = ticker;
+        this.time = time;
+        this.price = price;
+        this.volume = volume;
+    }
 
-        }
+    @Override
+    public int compareTo(QuoteBean o) {
+        return this.time.compareTo(o.getTime());
 
-        public String getSymbol() {
-            return symbol;
-        }
+    }
 
-        public String getTime() {
-            return time;
-        }
+    public String getSymbol() {
+        return symbol;
+    }
 
-        public double getPrice() {
-            return price;
-        }
+    public String getTime() {
+        return time;
+    }
 
-        public int getVolumne() {
-            return volume;
-        }
+    public double getPrice() {
+        return price;
+    }
 
+    public int getVolume() {
+        return volume;
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        str += getSymbol() + " - "
+                + getPrice() + " - "
+                + getVolume() + " - "
+                + getTime() + " - ";
+        return str;
+    }
 }

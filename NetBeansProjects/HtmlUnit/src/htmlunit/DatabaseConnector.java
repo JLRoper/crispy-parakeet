@@ -5,14 +5,12 @@
  */
 package htmlunit;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.apache.derby.jdbc.ClientDriver;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.derby.jdbc.ClientDriver;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -21,9 +19,10 @@ import org.apache.derby.jdbc.ClientDriver;
 public enum DatabaseConnector {
     INSTANCE;
 
+    public DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
     private Connection CONNECTION;
     private Statement STATEMENT;
-    final private String QUOTEDB_URL = "jdbc:derby://localhost:1540/GlassFishConnPool";
+    final private String QUOTEDB_URL = "jdbc:derby://localhost:1599/GlassFishConnPool";
     final private String QUOTEUSER = "admin";
     final private String QUOTEPASS = "admin";
 
@@ -31,19 +30,40 @@ public enum DatabaseConnector {
         new ClientDriver();
     }
 
-    public ResultSet executeSingleQuery(String sql) {
-        ResultSet result = null;
-        startStatement();
+    public void setupConnection() {
         startConnection();
+        startStatement();
+    }
+
+    public void cleanupConnection() {
+        stopStatement();
+        stopConnection();
+    }
+
+    public String getFormattedTimestamp() {
+        return TIMESTAMP_FORMAT.format(new Date(System.currentTimeMillis()));
+    }
+
+    public ResultSet executeQuery(String sql) {
+        ResultSet result = null;
         try {
             result = STATEMENT.executeQuery(sql);
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnector.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
-        stopStatement();
-        stopConnection();
         return result;
+    }
+
+    public int executeStandAloneUpdate(String sql) {
+        int success = 0;
+        try {
+            success = STATEMENT.executeUpdate(sql);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        return success;
     }
 
     private void startStatement() {
@@ -86,6 +106,25 @@ public enum DatabaseConnector {
             Logger.getLogger(DatabaseConnector.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
+    }
+
+    public String testQuery() throws SQLException {
+        String sql = "SELECT * FROM APP.QUOTE_TEST WHERE SYMBOL = 'XY2'";
+        DatabaseConnector.INSTANCE.setupConnection();
+        ResultSet rs = DatabaseConnector.INSTANCE.executeQuery(sql);
+        String out = "";
+        while (rs != null && rs.next()) {
+            out += (rs.getString("SYMBOL"));
+            System.out.println(rs.getString("SYMBOL"));
+            out += (rs.getString("PRICE"));
+            System.out.println(rs.getString("PRICE"));
+            out += (rs.getString("VOLUME"));
+            System.out.println(rs.getString("VOLUME"));
+            out += (rs.getString("TIMESTAMP"));
+            System.out.println(rs.getString("TIMESTAMP"));
+        }
+        DatabaseConnector.INSTANCE.cleanupConnection();
+        return out;
     }
 
 }

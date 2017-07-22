@@ -12,6 +12,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.ClientDataSource;
+import java.sql.Timestamp;
+import java.time.Instant;
+
 /**
  *
  * @author Jacob
@@ -24,7 +27,7 @@ public class HtmlUnitSQL {
 
     //  Database credentials
 //    static final String QUOTEDB_URL = "jdbc:derby:c:/Users/Jacob/.netbeans-derby/TESTQuoteDB";
-    static final String QUOTEDB_URL = "jdbc:derby://localhost:1577/GlassFishConnPool";
+    static final String QUOTEDB_URL = "jdbc:derby://localhost:1599/GlassFishConnPool";
     static final String QUOTEUSER = "admin";
     static final String QUOTEPASS = "admin";
     //  Database credentials
@@ -35,38 +38,48 @@ public class HtmlUnitSQL {
         new ClientDriver();
     }
 
+    public static String TEST_insertQuote() {
+        return "INSERT INTO APP.QUOTE_TEST "
+                + "(SYMBOL, PRICE, TIMESTAMP) "
+                + "VALUES('XY2', 12.34, '" + java.sql.Timestamp.from(Instant.now()).toString().replace("-", "").replace(".", "").substring(0, 14)+ "')";
+    }
+
     public static void main(String[] args) {
         Connection conn = null;
         Statement stmt = null;
         try {
             //STEP 2: Register JDBC driver
-            RegisterDriver();
+//            RegisterDriver();
 
             //STEP 3: Open a connection
             System.out.println("Connecting to database...");
-            conn = DriverManager.getConnection(QUOTEDB_URL, QUOTEUSER, QUOTEPASS);
+//            conn = DriverManager.getConnection(QUOTEDB_URL, QUOTEUSER, QUOTEPASS);
 //            conn = getJNDIConnection();
 //            conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
             //STEP 4: Execute a query
             System.out.println("Creating statement...");
-            stmt = conn.createStatement();
+//            stmt = conn.createStatement();
             String sql;
 //            sql = "SELECT personid, firstname, lastname, address FROM PERSONS";
-            sql = "SELECT * FROM APP.TABLETESTFROMNB";
-            ResultSet rs = stmt.executeQuery(sql);
 
+            sql = "SELECT * FROM APP.TABLETESTFROMNB";
+            DatabaseConnector.INSTANCE.setupConnection();
+            ResultSet rs = DatabaseConnector.INSTANCE.executeQuery(sql);
+
+//            ResultSet rs = stmt.executeQuery(sql);
             //STEP 5: Extract data from result set
-            while (rs.next()) {
+//            rs.beforeFirst();
+            while (rs != null && rs.next()) {
 
                 System.out.println(rs.getString("TEST"));
                 System.out.println(rs.getString("TESTSTRING"));
+
                 //Retrieve by column name
 //                int id = rs.getInt("personid");
 //                String address = rs.getString("address");
 //                String first = rs.getString("firstname");
 //                String last = rs.getString("lastname");
-
                 //Display values
 //                System.out.print("ID: " + id);
 //                System.out.print(", Address: " + address);
@@ -74,9 +87,10 @@ public class HtmlUnitSQL {
 //                System.out.println(", Last: " + last);
             }
             //STEP 6: Clean-up environment
-            rs.close();
-            stmt.close();
-            conn.close();
+//            rs.close();
+//            stmt.close();
+//            conn.close();
+            DatabaseConnector.INSTANCE.cleanupConnection();
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
