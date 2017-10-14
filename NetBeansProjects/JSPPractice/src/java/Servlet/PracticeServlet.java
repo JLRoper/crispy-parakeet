@@ -55,7 +55,9 @@ public class PracticeServlet extends HttpServlet {
         }
         Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol);
 
+        //test commit from netbeans
         JSONArray quoteArray = new JSONArray();
+        
 
         quoteMap.values().stream().forEach((quoteList) -> {
             quoteArray.add(quoteList.toString());
