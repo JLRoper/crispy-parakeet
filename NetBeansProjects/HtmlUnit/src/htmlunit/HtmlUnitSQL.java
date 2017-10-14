@@ -64,7 +64,7 @@ public class HtmlUnitSQL {
 //            sql = "SELECT personid, firstname, lastname, address FROM PERSONS";
 
             sql = "SELECT * FROM APP.TABLETESTFROMNB";
-            DatabaseConnector.INSTANCE.setupConnection();
+            DatabaseConnector.INSTANCE.setupConnection(false);
             ResultSet rs = DatabaseConnector.INSTANCE.executeQuery(sql);
 
 //            ResultSet rs = stmt.executeQuery(sql);

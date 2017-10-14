@@ -18,7 +18,7 @@ public class INT_DatabaseConnector {
     @Test
     public void executeQuery_runQuery_dataReturned() throws SQLException {
         String sql = "SELECT * FROM APP.QUOTE_TEST WHERE SYMBOL = 'XY2'";
-        DatabaseConnector.INSTANCE.setupConnection();
+        DatabaseConnector.INSTANCE.setupConnection(false);
         ResultSet rs = DatabaseConnector.INSTANCE.executeQuery(sql);
         while (rs != null && rs.next()) {
             System.out.println(rs.getString("SYMBOL"));

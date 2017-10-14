@@ -8,7 +8,10 @@ package htmlunit;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,14 +33,31 @@ public enum QuoteHandler {
 
     public final boolean DEBUG = true;
 
-    public void retreiveCurrentQuote(String... tickers) {
+    public String retreiveCurrentQuote(String... tickers) {
+        if (tickers.length == 1) {
+            for (String temp : tickers) {
+                tickers = temp.split(",");
+            }
+        }
+        String returnString = "QUOTEHANDLER: ";
+        Map<String, QuoteList> quotes = retreiveCurrentQuote(true, tickers);
+        QuoteList thisList = null;
+        for (String key : quotes.keySet()) {
+            thisList = quotes.get(key);
+            returnString += "/n " + thisList.toString();
+        }
+        return returnString;
+    }
+
+    public Map<String, QuoteList> retreiveCurrentQuote(boolean test, String... tickers) {
+        Map<String, QuoteList> quoteData;
         final XmlPage page;
-        String URL = buildYQSRequest(tickers[0]);
+        String URL = buildYQLReques(tickers);
 
         try (final WebClient webClient = new WebClient()) {
             page = webClient.getPage(URL);
 
-            Map<String, QuoteList> quoteData = parseYQSResponse(page.asXml());
+            quoteData = parseYQSResponse(page.asXml());
 
             QuoteList quoteList;
             for (String key : quoteData.keySet()) {
@@ -46,8 +66,10 @@ public enum QuoteHandler {
             }
 
         } catch (Exception ex) {
+            quoteData = null;
             Logger.getLogger(HtmlUnit.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return quoteData;
     }
 
     public Map<String, QuoteList> parseYQSResponse(String xml) throws Exception {
@@ -58,6 +80,7 @@ public enum QuoteHandler {
         String sym, time;
         Double price;
         int vol;
+        String percentChange;
 
         int countQuote = 0;
         NodeList nodes = selectNodesFromXML(xml, "quote");
@@ -69,8 +92,9 @@ public enum QuoteHandler {
             /* Create new QuoteBean from data in quote element. */
             sym = getStringDataFromTag(quoteElement, "Symbol");
             price = Double.parseDouble(getStringDataFromTag(quoteElement, "LastTradePriceOnly"));
-            vol = Integer.parseInt(getStringDataFromTag(quoteElement, "Volume"));
-            currentQuote = new QuoteBean(sym, DatabaseConnector.INSTANCE.getFormattedTimestamp(), price, vol);
+            percentChange = getStringDataFromTag(quoteElement, "ChangeinPercent");
+//            vol = Integer.parseInt(getStringDataFromTag(quoteElement, "ChangeinPercent"));
+            currentQuote = new QuoteBean(sym, DatabaseConnector.INSTANCE.getFormattedTimestamp(), price, percentChange);
 
             /* Add new QuoteBean to the appropriate QuoteList. */
             quoteList = symbolMap.get(currentQuote.getSymbol());
@@ -113,6 +137,31 @@ public enum QuoteHandler {
                 //                + "&diagnostics=true"
                 + "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
         return url;
+    }
+
+    private String buildYQLReques(String... st) {
+        String url = "";
+        List<String> tickers = new ArrayList<String>(Arrays.asList(st));
+        url += "https://query.yahooapis.com/v1/public/yql?q=";
+        url += buildYQLQuery(tickers);
+        url += "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";;
+        return url;
+    }
+
+    private String buildYQLQuery(List<String> tickers) {
+        String query = "";
+        query += "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20";
+        query += "(";
+        for (String tick : tickers) {
+            query += "%22";
+            query += tick;
+            query += "%22";
+            query += "%2C";
+        }
+        //take off the last comma
+        query = query.substring(0, query.length() - 3);
+        query += ")";
+        return query;
     }
 
     /**

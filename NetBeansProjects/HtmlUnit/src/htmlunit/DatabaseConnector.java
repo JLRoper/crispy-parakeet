@@ -22,6 +22,7 @@ public enum DatabaseConnector {
     public DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
     private Connection CONNECTION;
     private Statement STATEMENT;
+//    final private String QUOTEDB_URL = "jdbc:derby://localhost:1527/GlassFishConnPool";
     final private String QUOTEDB_URL = "jdbc:derby://localhost:1599/GlassFishConnPool";
     final private String QUOTEUSER = "admin";
     final private String QUOTEPASS = "admin";
@@ -30,8 +31,8 @@ public enum DatabaseConnector {
         new ClientDriver();
     }
 
-    public void setupConnection() {
-        startConnection();
+    public void setupConnection(boolean useConPool) {
+        startConnection(useConPool);
         startStatement();
     }
 
@@ -88,12 +89,19 @@ public enum DatabaseConnector {
         }
     }
 
-    private void startConnection() {
+    private void startConnection(boolean useConPool) {
         RegisterDriver();
         CONNECTION = null;
+        // Look up the connection pool data source
         try {
-            CONNECTION = DriverManager.getConnection(QUOTEDB_URL, QUOTEUSER, QUOTEPASS);
-        } catch (SQLException ex) {
+            if (useConPool) {
+                javax.naming.InitialContext ctx = new javax.naming.InitialContext();
+                javax.sql.DataSource ds = (javax.sql.DataSource) ctx.lookup("jdbc/__default");
+                CONNECTION = ds.getConnection();
+            } else {
+                CONNECTION = DriverManager.getConnection(QUOTEDB_URL, QUOTEUSER, QUOTEPASS);
+            }
+        } catch (Throwable ex) {
             Logger.getLogger(DatabaseConnector.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
@@ -108,9 +116,9 @@ public enum DatabaseConnector {
         }
     }
 
-    public String testQuery() throws SQLException {
+    public String testQuery(boolean useConnPool) throws SQLException {
         String sql = "SELECT * FROM APP.QUOTE_TEST WHERE SYMBOL = 'XY2'";
-        DatabaseConnector.INSTANCE.setupConnection();
+        DatabaseConnector.INSTANCE.setupConnection(useConnPool);
         ResultSet rs = DatabaseConnector.INSTANCE.executeQuery(sql);
         String out = "";
         while (rs != null && rs.next()) {

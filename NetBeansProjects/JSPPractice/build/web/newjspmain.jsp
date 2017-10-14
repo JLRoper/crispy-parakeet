@@ -5,7 +5,6 @@
 --%>
 
 <%@ page contentType="text/html; charset=iso-8859-1" language="java"%>
-<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 <!--<script>
     //Show tooltip on mouseover
     //    $('body').on('click', '#button_1', function() {
