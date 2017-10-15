@@ -38,13 +38,7 @@ public class PracticeServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        response.setContentType("text/html");
-//        PrintWriter out = response.getWriter();
         JSONObject jsonObject = null;
-//        String param1 = request.getParameter("param1");
-//        param1 = param1 != null ? param1 : "";
-//        out.println("<html><head><title>Hello World!</title></head>");
-//        out.println("<body><h1>Hello World! param1: " + param1 + " </h1></body></html>");
         JSONObject returnJson = new JSONObject();
         String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
         String jsonString = request.getParameter("lastName");
@@ -57,7 +51,6 @@ public class PracticeServlet extends HttpServlet {
 
         //test commit from netbeans
         JSONArray quoteArray = new JSONArray();
-        
 
         quoteMap.values().stream().forEach((quoteList) -> {
             quoteArray.add(quoteList.toString());
@@ -68,46 +61,8 @@ public class PracticeServlet extends HttpServlet {
         response.setContentType("application/JSON");
         response.getWriter().write(returnJson.toJSONString());
 
-//        String jsonObject = "{ key1: 'value1', key2: 'value2' }";
-//        String stuff = request.getParameter("data");
-//        String stuff2 = request.getParameter("teststuff");
-//        response.setContentType("application/json");
-//// Get the printwriter object from response to write the required json object to the output stream      
-//        PrintWriter printout = response.getWriter();
-//// Assuming your json object is **jsonObject**, perform the following, it will return your json object  
-//        printout.write(jsonObject);
-//        
-//        printout.flush();
-//        response.setContentType("text/html;charset=UTF-8");
-////        request.getRequestDispatcher("/newjspmain.jsp").forward(request, response);
-//        try (PrintWriter out = response.getWriter()) {
-//            /* TODO output your page here. You may use following sample code. */
-//            out.println("<!DOCTYPE html>");
-//            out.println("<html>");
-//            out.println("<head>");
-//            out.println("<title>Servlet PracticeServlet</title>");
-//            out.println("</head>");
-//            out.println("<body>");
-////            try {
-////                out.println("<h1>Servlet PracticeServlet at " + request.getContextPath() + ""
-////                        + " " + DatabaseConnector.INSTANCE.testQuery(false) + "</h1>");
-////            } catch (SQLException ex) {
-////                Logger.getLogger(PracticeServlet.class.getName()
-////                ).log(Level.SEVERE, null, ex);
-////            }
-//            out.println("</body>");
-//            out.println("</html>");
-//        }
     }
 
-//    @Override
-//    public void service(HttpServletRequest req,
-//            HttpServletResponse res) throws IOException {
-//        res.setContentType("text/html");
-//        PrintWriter out = res.getWriter();
-//        out.println("<html><head><title>Hello World!</title></head>");
-//        out.println("<body><h1>Hello World!</h1></body></html>");
-//    }
     private void forwardToPage(final HttpServletRequest request,
             final HttpServletResponse response,
             String url)
