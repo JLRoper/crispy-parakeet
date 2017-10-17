@@ -7,7 +7,7 @@ package htmlunit;
 
 /**
  *
- * @author Jacob
+ * @author Jacob test changes
  */
 public class QuoteBean implements Comparable<QuoteBean> {
 
