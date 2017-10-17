@@ -53,7 +53,7 @@ public class PracticeServlet extends HttpServlet {
         JSONArray quoteArray = new JSONArray();
 
         quoteMap.values().stream().forEach((quoteList) -> {
-            quoteArray.add(quoteList.toString());
+            quoteArray.add(quoteList.toString().toUpperCase());
         });
 
         returnJson.put("count", quoteArray.size());

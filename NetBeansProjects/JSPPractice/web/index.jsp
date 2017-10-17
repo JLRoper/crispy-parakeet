@@ -28,12 +28,12 @@
             $("#tickerBox").toggleClass('classWithShadow');
         });
 
-        $("#flex-item-interior").bind("mouseleave", function () {
-            $(".flex-item").bind("click", expandBox);
-        });
-        $("#flex-item-interior").bind("mouseover", function () {
-            $(".flex-item").unbind("click", expandBox);
-        });
+//        $("#flex-item-interior").bind("mouseleave", function () {
+//            $(".flex-item").bind("click", expandBox);
+//        });
+//        $("#flex-item-interior").bind("mouseover", function () {
+//            $(".flex-item").unbind("click", expandBox);
+//        });
 
         var interval = function () {
             setInterval(function () {
@@ -41,73 +41,83 @@
             }, 15000);
         };
         interval();
-    });
 
 
 
-    var test = {
-        sup1: {test1: "DATA1", test3: "Data3"},
-        sup2: {test1: "DATA1", test3: "Data3"},
-        sup3: {test1: "DATA1", test3: "Data3"}
-    };
+        var test = {
+            sup1: {test1: "DATA1", test3: "Data3"},
+            sup2: {test1: "DATA1", test3: "Data3"},
+            sup3: {test1: "DATA1", test3: "Data3"}
+        };
 
 
 
-    var pollStockInfo = function () {
-        $.ajax({
-            url: "PracticeServlet",
-            action: "GetSingleQuote",
-            type: "POST",
-            dataType: "JSON",
-            data: {
-                symbol: $("#symbol").val(),
-                lastName: JSON.stringify(test)
-            },
-            success: function (data) {
-                var printStr = "";
-                var quoteInfo = data.quoteInfo;
-                var count = data.count;
-                if (quoteInfo) {
-                    for (var i = 0; i < count; i++) {
-                        if (quoteInfo[i]) {
-                            printStr += "<div>";
-                            printStr += quoteInfo[i];
-                            printStr += "</div>";
+        var pollStockInfo = function () {
+            $.ajax({
+                url: "PracticeServlet",
+                action: "GetSingleQuote",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    symbol: $("#symbol").val(),
+                    lastName: JSON.stringify(test)
+                },
+                success: function (data) {
+                    var printStr = "";
+                    var quoteInfo = data.quoteInfo;
+                    var count = data.count;
+                    if (quoteInfo) {
+                        for (var i = 0; i < count; i++) {
+                            if (quoteInfo[i]) {
+                                printStr += "<div>";
+                                printStr += quoteInfo[i];
+                                printStr += "</div>";
+                            }
                         }
+                        $("#stockInfoResults").html(printStr);
                     }
-                    $("#stockInfoResults").html(printStr);
-                }
-            },
-            error: function (data, status, er) {
+                },
+                error: function (data, status, er) {
 //                alert("error: " + data + " status: " + status + " er:" + er);
-            }
-        });
-        return false;
-    };
-
-
-    var openFullItem = function () {
-        $(this).parent().parent().parent().parent().parent().toggleClass('observer-item-open');
-    };
-    $(".observer-carousel-unit").click(openFullItem());
-
-    $(".flex-item").mousedown(function ()
-    {
-        $(this).addClass('observer-button-pressed');
-    });
-
-    $(".owl-carousel").owlCarousel(
-            {
-                items: 1,
-                autoWidth: true
+                }
             });
+            return false;
+        };
 
-    $(".flex-item").mouseup(function ()
-    {
-        $(this).removeClass('observer-button-pressed');
+
+        var openFullItem = function () {
+            $(this).parent().parent().parent().parent().parent().toggleClass('observer-item-open');
+        };
+        $(".observer-carousel-unit").click(openFullItem());
+
+        $(".flex-item").mousedown(function ()
+        {
+            $(this).addClass('observer-button-pressed');
+        });
+
+        $(".owl-carousel").owlCarousel(
+                {
+                    items: 1,
+                    autoWidth: true
+                });
+
+        $(".flex-item").mouseup(function ()
+        {
+            $(this).removeClass('observer-button-pressed');
+        });
+
+
+        $("#symbol").keyup(function () {
+            var symbols = $("#symbol").val();
+            if (symbols.substring(symbols.length - 1, symbols.length) == ',') {
+                return;
+            }
+            pollStockInfo();
+        });
+
+
+
     });
-
-
 
 </script>
 
@@ -162,7 +172,7 @@
                     <div id="minimizeButton" style="width: 100%; height:30px;text-align: center; background-color: white">Title of Box</div>
                     <div class="flex-item-interior"style="z-index: 11;">
                         Symbol: <input type="text"id="symbol" value="AMD"><br>
-                        <input id="submitSymbolButton"  onclick="pollStockInfo()" type="submit" value="Submit">
+                        <!--<input id="submitSymbolButton"  onclick="pollStockInfo()" type="submit" value="Submit">-->
                         <div id="stockInfoResults">
                         </div>
                     </div>
