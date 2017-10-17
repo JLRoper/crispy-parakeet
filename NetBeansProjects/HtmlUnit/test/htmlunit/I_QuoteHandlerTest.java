@@ -19,7 +19,7 @@ public class I_QuoteHandlerTest {
         double addedAmount = 0.0;
         double fromPaycheck = 500.0;
         double dividen;
-        for (int i = 1; i <= 12 *16; i++) {
+        for (int i = 1; i <= 12 * 16; i++) {
             addedAmount = fromPaycheck + (dividen = (amount * 0.014));
             amount = amount + addedAmount;
             System.out.println("@@@@@Iteration: " + i);
@@ -34,4 +34,8 @@ public class I_QuoteHandlerTest {
         QuoteHandler.INSTANCE.retreiveCurrentQuote("AMD", "NVDA");
     }
 
+    @Test
+    public void builderURLTEST() {
+        QuoteHandler.INSTANCE.encodeURLString("select * from testtable where symbol in ('AMD','NVDA')");
+    }
 }

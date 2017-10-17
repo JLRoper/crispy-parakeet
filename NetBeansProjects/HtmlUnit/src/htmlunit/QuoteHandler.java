@@ -8,6 +8,7 @@ package htmlunit;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public enum QuoteHandler {
 
     public Map<String, QuoteList> retreiveCurrentQuote(boolean test, String... tickers) {
         Map<String, QuoteList> quoteData;
-        final XmlPage page;
+        final XmlPage page; 
         String URL = buildYQLReques(tickers);
 
         try (final WebClient webClient = new WebClient()) {
@@ -129,39 +130,52 @@ public enum QuoteHandler {
         return "";
     }
 
-    private String buildYQSRequest(String ticker) {
-        String url = "";
-        ticker = ticker.toUpperCase();
-        url = "https://query.yahooapis.com/v1/public/yql?q="
-                + "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22" + ticker + "%22)"
-                //                + "&diagnostics=true"
-                + "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
-        return url;
-    }
-
     private String buildYQLReques(String... st) {
         String url = "";
-        List<String> tickers = new ArrayList<String>(Arrays.asList(st));
+        List<String> tickers = new ArrayList<>(Arrays.asList(st));
         url += "https://query.yahooapis.com/v1/public/yql?q=";
         url += buildYQLQuery(tickers);
         url += "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";;
         return url;
     }
 
-    private String buildYQLQuery(List<String> tickers) {
-        String query = "";
-        query += "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20";
-        query += "(";
-        for (String tick : tickers) {
-            query += "%22";
-            query += tick;
-            query += "%22";
-            query += "%2C";
+    private String buildYQLQuery(List<String> syms) {
+        StringBuilder urlYQL = new StringBuilder();
+        urlYQL.append("select * from yahoo.finance.quotes where smybol in ");
+        urlYQL.append("(");
+        syms.stream().forEach((sym) -> {
+            urlYQL.append(sym).
+                    append(syms.indexOf(sym) == syms.size() ? "" : ",");
+        });
+        urlYQL.append(");");
+        return urlYQL.toString();
+    }
+
+    /**
+     * All URLs must be encoded in this format before being sent.
+     *
+     * @param inputURL String form of URL to be encoded.
+     * @return String Encoded form of inputURL. Input object is returned if
+     * unable to encode.
+     */
+    protected String encodeURLString(
+            String inputURL) {
+        if (inputURL == null
+                || inputURL.trim().isEmpty()) {
+            return inputURL;
         }
-        //take off the last comma
-        query = query.substring(0, query.length() - 3);
-        query += ")";
-        return query;
+        String outputURL = "";
+        try {
+            outputURL = java.net.URLEncoder.encode(inputURL, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(QuoteHandler.class.getName()).
+                    log(
+                            Level.SEVERE,
+                            "Unable to encode URL String...  "
+                            + inputURL,
+                            ex);
+        }
+        return outputURL;
     }
 
     /**
