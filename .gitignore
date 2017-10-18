@@ -12,3 +12,4 @@
 /NetBeansProjects/JSPPractice/build/
 /NetBeansProjects/JSPPractice/dist/
 NetBeansProjects/JSPPractice/nbproject/genfiles.properties
+*.war
