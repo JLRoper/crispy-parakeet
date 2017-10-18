@@ -38,6 +38,13 @@ public class PracticeServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = blankNullTrim(request.getParameter("action"));
+
+        switch (action) {
+            case "GetSingleQuote":
+                break;
+        }
+
         JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
         String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
@@ -63,12 +70,42 @@ public class PracticeServlet extends HttpServlet {
 
     }
 
+    private void loadStockTicker(final HttpServletRequest request,
+            final HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = null;
+        JSONObject returnJson = new JSONObject();
+        String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
+        String jsonString = request.getParameter("lastName");
+        JSONParser parser = new JSONParser();
+        try {
+            jsonObject = (JSONObject) parser.parse(jsonString);
+        } catch (ParseException ex) {
+        }
+        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol);
+
+        //test commit from netbeans
+        JSONArray quoteArray = new JSONArray();
+
+        quoteMap.values().stream().forEach((quoteList) -> {
+            quoteArray.add(quoteList.toString().toUpperCase());
+        });
+
+        returnJson.put("count", quoteArray.size());
+        returnJson.put("quoteInfo", quoteArray);
+        response.setContentType("application/JSON");
+        response.getWriter().write(returnJson.toJSONString());
+    }
+
     private void forwardToPage(final HttpServletRequest request,
             final HttpServletResponse response,
             String url)
             throws IOException, ServletException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
         dispatcher.forward(request, response);
+    }
+
+    private String blankNullTrim(String input) {
+        return input != null ? input.trim() : "";
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
