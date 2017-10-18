@@ -128,7 +128,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Observer</h1>
+        <h1>Observer James</h1>
         <div id="displayContainer">
             <div class="flex-container">
 
