@@ -105,7 +105,7 @@
         {
             $(this).removeClass('observer-button-pressed');
         });
-
+//tst
 
         $("#symbol").keyup(function () {
             var symbols = $("#symbol").val();
