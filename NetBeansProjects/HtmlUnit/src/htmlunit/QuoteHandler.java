@@ -144,14 +144,14 @@ public enum QuoteHandler {
 
     private String buildYQLQuery(List<String> syms) {
         StringBuilder urlYQL = new StringBuilder();
-        urlYQL.append("select * from yahoo.finance.quotes where smybol in ");
+        urlYQL.append("select * from yahoo.finance.quotes where symbol in ");
         urlYQL.append("(");
         syms.stream().forEach((sym) -> {
-            urlYQL.append("%22").append(sym).append("%22").
-                    append(syms.indexOf(sym) == syms.size() ? "" : ",");
+            urlYQL.append("%22").append(sym).append("%22,");
         });
-        urlYQL.append(");");
-        return urlYQL.toString();
+        StringBuilder returnYQL = new StringBuilder(urlYQL.toString().substring(0, urlYQL.length() -1));
+        returnYQL.append(");");
+        return returnYQL.toString();
     }
 
     /**
