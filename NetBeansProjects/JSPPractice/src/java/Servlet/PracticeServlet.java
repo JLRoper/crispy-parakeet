@@ -54,7 +54,8 @@ public class PracticeServlet extends HttpServlet {
             jsonObject = (JSONObject) parser.parse(jsonString);
         } catch (ParseException ex) {
         }
-        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol);
+
+        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol.split(","));
 
         //test commit from netbeans
         JSONArray quoteArray = new JSONArray();
@@ -74,14 +75,14 @@ public class PracticeServlet extends HttpServlet {
             final HttpServletResponse response) throws IOException {
         JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
-        String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
+        String symbols = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
         String jsonString = request.getParameter("lastName");
         JSONParser parser = new JSONParser();
         try {
             jsonObject = (JSONObject) parser.parse(jsonString);
         } catch (ParseException ex) {
         }
-        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol);
+        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbols.split(","));
 
         //test commit from netbeans
         JSONArray quoteArray = new JSONArray();

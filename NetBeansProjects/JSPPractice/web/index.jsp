@@ -66,12 +66,16 @@
                     var printStr = "";
                     var quoteInfo = data.quoteInfo;
                     var count = data.count;
+                    var symbol;
                     if (quoteInfo) {
                         for (var i = 0; i < count; i++) {
                             if (quoteInfo[i]) {
-                                printStr += "<div  style=\"background-color:"
-                                        + true ? "green" : "red"
-                                        + ";\">";
+//                                symbol = (quotInfo[i]);
+//                                
+//                                printStr += "<div id=\"" + symbol  "\" style=\"background-color:"
+//                                        + true ? "green" : "red"
+//                                        + ";\">";
+                                printStr += "<div>";
                                 printStr += quoteInfo[i];
                                 printStr += "</div>";
                             }

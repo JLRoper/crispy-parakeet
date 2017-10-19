@@ -147,7 +147,7 @@ public enum QuoteHandler {
         urlYQL.append("select * from yahoo.finance.quotes where smybol in ");
         urlYQL.append("(");
         syms.stream().forEach((sym) -> {
-            urlYQL.append(sym).
+            urlYQL.append("%22").append(sym).append("%22").
                     append(syms.indexOf(sym) == syms.size() ? "" : ",");
         });
         urlYQL.append(");");
