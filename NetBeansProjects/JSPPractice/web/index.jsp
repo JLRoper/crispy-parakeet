@@ -69,7 +69,9 @@
                     if (quoteInfo) {
                         for (var i = 0; i < count; i++) {
                             if (quoteInfo[i]) {
-                                printStr += "<div>";
+                                printStr += "<div  style=\"background-color:"
+                                        + true ? "green" : "red"
+                                        + ";\">";
                                 printStr += quoteInfo[i];
                                 printStr += "</div>";
                             }
