@@ -41,7 +41,8 @@ public enum QuoteHandler {
             }
         }
         String returnString = "QUOTEHANDLER: ";
-        Map<String, QuoteList> quotes = retreiveCurrentQuote(true, tickers);
+        Map<String, QuoteList> quotes
+                = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, tickers);
         QuoteList thisList = null;
         for (String key : quotes.keySet()) {
             thisList = quotes.get(key);
@@ -50,10 +51,12 @@ public enum QuoteHandler {
         return returnString;
     }
 
-    public Map<String, QuoteList> retreiveCurrentQuote(boolean test, String... tickers) {
+    public Map<String, QuoteList> retreiveCurrentQuote(
+            boolean test,
+            String... tickers) {
         Map<String, QuoteList> quoteData;
-        final XmlPage page; 
-        String URL = buildYQLReques(tickers);
+        final XmlPage page;
+        String URL = buildHttpURL(tickers);
 
         try (final WebClient webClient = new WebClient()) {
             page = webClient.getPage(URL);
@@ -130,7 +133,7 @@ public enum QuoteHandler {
         return "";
     }
 
-    private String buildYQLReques(String... st) {
+    private String buildHttpURL(String... st) {
         String url = "";
         List<String> tickers = new ArrayList<>(Arrays.asList(st));
         url += "https://query.yahooapis.com/v1/public/yql?q=";
