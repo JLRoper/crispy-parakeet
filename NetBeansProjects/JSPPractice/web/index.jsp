@@ -1,7 +1,7 @@
 <%-- 
     Document   : index
     Created on : Oct 1, 2017, 11:29:49 PM
-    Author     : Jacob
+    Author     : Jacob and James
 --%>
 
 <%@page import="htmlunit.QuoteHandler"%>
@@ -130,7 +130,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Observer James auto</h1>
+        <h1>Observer</h1>
         <div id="displayContainer">
             <div class="flex-container">
 
