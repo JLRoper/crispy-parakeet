@@ -21,5 +21,5 @@
     </body>
 </html>
 
-<script src="JS/index.menu.js"/>
+<script src="JS/index.menu.js"></script>
 
