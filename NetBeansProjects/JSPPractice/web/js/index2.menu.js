@@ -7,12 +7,12 @@
 
 
 
-    var links = [{label: 'link1', bg: '#c0392b'},
-        {label: 'link2', bg: '#16a085', linkRef:'pornhum.com'},
+    var links = [{label: 'TradingDive', bg: '#c0392b'},
+        {label: 'link2', bg: '#16a085', linkRef:'index.jsp'},
         {label: 'link3', bg: '#8e44ad'},
         {label: 'link4', bg: '#27ae60'},
         {label: 'link5', bg: '#f39c12'},
-        {label: 'link6', bg: '#2980b9'}];
+        {label: 'Jakes Observer', bg: '#2980b9', linkRef:'index.jsp'}];
     var windowHeight = window.innerHeight;
     if (windowHeight === 0)
         windowHeight = 238;
