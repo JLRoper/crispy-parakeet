@@ -13,6 +13,14 @@ import org.junit.Test;
  */
 public class I_QuoteHandlerTest {
 
+    {
+//System.setProperty("javax.net.ssl.trustStore", "C:/.keystore");
+//System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+//        System.setProperty("javax.net.ssl.keyStore", "keystore.jks");
+//        System.setProperty("javax.net.ssl.keyStore", "clientkeystore.jks");
+//        System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+    }
+
     @Test
     public void test2() {
         double amount = 0.0;
@@ -31,6 +39,16 @@ public class I_QuoteHandlerTest {
 
     @Test
     public void retreiveCurrentQuote() {
+        try {
+            I_QuoteHandlerTest.class.getResource("clientkeystore.jks").getFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        String trustStore = System.getProperty("javax.net.ssl.keyStore");
+
+        String storeLoc;
+        storeLoc = System.getProperty("java.class.path");
+        System.out.println("classpath: " + storeLoc);
         QuoteHandler.INSTANCE.retreiveCurrentQuote("AMD", "NVDA");
     }
 

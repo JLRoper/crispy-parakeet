@@ -13,3 +13,12 @@
 /NetBeansProjects/JSPPractice/dist/
 NetBeansProjects/JSPPractice/nbproject/genfiles.properties
 *.war
+*.war
+NetBeansProjects/JSPPractice/nbproject/genfiles.properties
+*.xml~
+NetBeansProjects/JSPPractice/nbproject/project.xml
+NetBeansProjects/JSPPractice/nbproject/build-impl.xml
+/NetBeansProjects/JamesSPPractice/nbproject/private/
+/NetBeansProjects/JamesSPPractice/build/
+/NetBeansProjects/JamesSPPractice/dist/
+*.war

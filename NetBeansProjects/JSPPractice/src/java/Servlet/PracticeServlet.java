@@ -5,10 +5,16 @@
  */
 package Servlet;
 
+import htmlunit.QuoteBean;
 import htmlunit.QuoteHandler;
 import htmlunit.QuoteList;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,6 +33,14 @@ import org.json.simple.parser.ParseException;
 @WebServlet(name = "PracticeServlet", urlPatterns = {"/PracticeServlet"})
 public class PracticeServlet extends HttpServlet {
 
+    SimpleDateFormat sdf = new SimpleDateFormat("hh-mm-ss");
+    Map<String, QuoteBean> lastPollData = new HashMap<String, QuoteBean>();
+    Map<String, Long> lastPollTime = new HashMap<String, Long>();
+
+    long lastPoll = 1;
+    long thisPoll = 1;
+    QuoteBean lastQuote;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -39,13 +53,20 @@ public class PracticeServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = blankNullTrim(request.getParameter("action"));
-
         switch (action) {
             case "GetSingleQuote":
+                loadStockTicker(request, response);
+                break;
+            case "AnotherAction":
+                newAction(request, response);
                 break;
         }
 
-        JSONObject jsonObject = null;
+    }
+
+    private void newAction(final HttpServletRequest request,
+            final HttpServletResponse response) throws IOException {
+         JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
         String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
         String jsonString = request.getParameter("lastName");
@@ -55,22 +76,31 @@ public class PracticeServlet extends HttpServlet {
         } catch (ParseException ex) {
         }
 
-        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbol.split(","));
+        String cleanSymbol = symbol.split(",")[0].trim().toUpperCase();
+        lastPoll = lastPollTime.get(cleanSymbol) != null ? lastPollTime.get(cleanSymbol) : 0;
+        lastQuote = lastPollData.get(cleanSymbol);
 
-        //test commit from netbeans
+        try {
+            if (System.currentTimeMillis() - lastPoll > 10000) {
+                lastQuote = QuoteHandler.INSTANCE.retrieveRobinhoodQuote(cleanSymbol);
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                System.out.println("- Submitting web request to Robinhoodd: " + symbol);
+                lastPoll = System.currentTimeMillis();
+                lastPollTime.put(cleanSymbol, lastPoll);
+                lastPollData.put(cleanSymbol, lastQuote);
+                System.out.println("-   This Submit: " + sdf.format(new Date(lastPoll)));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(PracticeServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         JSONArray quoteArray = new JSONArray();
-
-        quoteMap.values().stream().forEach((quoteList) -> {
-            quoteArray.add(quoteList.toString().toUpperCase());
-        });
-
+        quoteArray.add(lastQuote.toString());
         returnJson.put("count", quoteArray.size());
         returnJson.put("quoteInfo", quoteArray);
         response.setContentType("application/JSON");
         response.getWriter().write(returnJson.toJSONString());
-
     }
-
     private void loadStockTicker(final HttpServletRequest request,
             final HttpServletResponse response) throws IOException {
         JSONObject jsonObject = null;

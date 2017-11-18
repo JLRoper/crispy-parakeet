@@ -9,15 +9,19 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +37,14 @@ public enum QuoteHandler {
     INSTANCE;
 
     public final boolean DEBUG = true;
+
+    public static void main(String[] args) throws Exception {
+        try {
+            INSTANCE.retrieveRobinhoodQuote("AMD");
+        } catch (Exception ex) {
+            Logger.getLogger(HttpsClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public String retreiveCurrentQuote(String... tickers) {
         if (tickers.length == 1) {
@@ -51,13 +63,63 @@ public enum QuoteHandler {
         return returnString;
     }
 
+    public QuoteBean retrieveRobinhoodQuote(String sym) throws Exception {
+        String URL = buildRobinhoodRequest(sym);
+
+        System.out.println(URL);
+        JSONObject rawJSON = HttpsClient.ROBINHOOD.submitHttpsRequest(URL);
+        if (rawJSON == null) {
+            return null;
+        }
+
+        QuoteBean quoteBean = parseRobinhoodResponse(sym, rawJSON);
+        System.out.println(quoteBean);
+
+        return quoteBean;
+    }
+
+    public QuoteBean retrieveAlphaVantageQuote(String sym) throws Exception {
+        String URL = buildHttpAlphaVantage(sym);
+
+        JSONObject rawJSON = HttpsClient.ALPHA_VANTAGE.submitHttpsRequest(URL);
+        if (rawJSON == null) {
+            return null;
+        }
+
+        QuoteBean quoteBean = parseAlphaVantageResponse(sym, rawJSON);
+        System.out.println(quoteBean);
+
+        return quoteBean;
+    }
+
+    private QuoteBean parseAlphaVantageResponse(String sym, JSONObject rawJSON) {
+        JSONObject curData = (JSONObject) rawJSON.get("Time Series (1min)");
+        Set keys = curData.keySet();
+        JSONObject thisMinute = (JSONObject) curData.get(keys.iterator().next());
+
+        return new QuoteBean(
+                sym,
+                "time",
+                Double.parseDouble(((String) thisMinute.get("4. close")).replace("\"", "")),
+                (String) thisMinute.get("5. volume"));
+    }
+
+    private QuoteBean parseRobinhoodResponse(String sym, JSONObject rawJSON) {
+        JSONObject curData = rawJSON;
+        return new QuoteBean(
+                (String) curData.get("symbol"),
+                (String) curData.get("updated_at"),
+                Double.parseDouble(((String) curData.get("last_extended_hours_trade_price")).replace("\"", "")),
+                "volume");
+    }
+
     public Map<String, QuoteList> retreiveCurrentQuote(
             boolean test,
             String... tickers) {
         Map<String, QuoteList> quoteData;
         final XmlPage page;
-        String URL = buildHttpURL(tickers);
 
+        String URL = buildHttpURLYQL(tickers);
         try (final WebClient webClient = new WebClient()) {
             page = webClient.getPage(URL);
 
@@ -70,6 +132,7 @@ public enum QuoteHandler {
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             quoteData = null;
             Logger.getLogger(HtmlUnit.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,7 +196,17 @@ public enum QuoteHandler {
         return "";
     }
 
-    private String buildHttpURL(String... st) {
+    private String buildRobinhoodRequest(String st) {
+        String url = "quotes/" + st + "/";
+        return url;
+    }
+
+    private String buildHttpAlphaVantage(String st) {
+        String url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + st + "&interval=1min&apikey=EJ9CA0A5TPHUU5Y1";
+        return url;
+    }
+
+    private String buildHttpURLYQL(String... st) {
         String url = "";
         List<String> tickers = new ArrayList<>(Arrays.asList(st));
         url += "https://query.yahooapis.com/v1/public/yql?q=";
@@ -149,7 +222,7 @@ public enum QuoteHandler {
         syms.stream().forEach((sym) -> {
             urlYQL.append("%22").append(sym).append("%22,");
         });
-        StringBuilder returnYQL = new StringBuilder(urlYQL.toString().substring(0, urlYQL.length() -1));
+        StringBuilder returnYQL = new StringBuilder(urlYQL.toString().substring(0, urlYQL.length() - 1));
         returnYQL.append(");");
         return returnYQL.toString();
     }
