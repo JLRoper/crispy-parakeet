@@ -71,7 +71,7 @@
                 </div> 
                 <div class="flex-tile-location">
                     <div class="flex-tile">
-                        <form action="PracticeServlet">
+                        <form action="PracaticeServlet">
                             First name: <input type="text" name="param1" value="Mickey"><br>
                             Last name: <input type="text" name="LastName" value="Mouse"><br>
                             <input type="submit" value="Submit">

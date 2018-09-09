@@ -7,7 +7,6 @@ package Servlet;
 
 import htmlunit.QuoteBean;
 import htmlunit.QuoteHandler;
-import htmlunit.QuoteList;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,20 +52,31 @@ public class PracticeServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = blankNullTrim(request.getParameter("action"));
-        switch (action) {
-            case "GetSingleQuote":
+        switch (ServletAction.getAction(action)) {
+            case GET_SINGLE_QUOTE:
                 loadStockTicker(request, response);
                 break;
-            case "AnotherAction":
-                newAction(request, response);
+            case ANOTHER_ACTION:
+                anotherAction(request, response);
                 break;
         }
 
     }
 
-    private void newAction(final HttpServletRequest request,
+    public enum ServletAction {
+        GET_SINGLE_QUOTE,
+        ANOTHER_ACTION,
+        TEST_ACTION_1,
+        TEST_ACTION_2;
+
+        public static ServletAction getAction(String actionString) {
+            return ServletAction.valueOf(actionString.trim().toUpperCase());
+        }
+    }
+
+    private void anotherAction(final HttpServletRequest request,
             final HttpServletResponse response) throws IOException {
-         JSONObject jsonObject = null;
+        JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
         String symbol = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
         String jsonString = request.getParameter("lastName");
@@ -78,7 +88,7 @@ public class PracticeServlet extends HttpServlet {
 
         String cleanSymbol = symbol.split(",")[0].trim().toUpperCase();
         lastPoll = lastPollTime.get(cleanSymbol) != null ? lastPollTime.get(cleanSymbol) : 0;
-        lastQuote = lastPollData.get(cleanSymbol);
+        lastQuote = lastPollData.get(cleanSymbol) != null ? lastPollData.get(cleanSymbol) : new QuoteBean("", "", 0.0, "0");
 
         try {
             if (System.currentTimeMillis() - lastPoll > 10000) {
@@ -101,26 +111,40 @@ public class PracticeServlet extends HttpServlet {
         response.setContentType("application/JSON");
         response.getWriter().write(returnJson.toJSONString());
     }
+
     private void loadStockTicker(final HttpServletRequest request,
             final HttpServletResponse response) throws IOException {
         JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
-        String symbols = request.getParameter("symbol") != null ? request.getParameter("symbol") : "";
-        String jsonString = request.getParameter("lastName");
+        String jsonString = request.getParameter("payload");
+        String symbol = "";
         JSONParser parser = new JSONParser();
         try {
             jsonObject = (JSONObject) parser.parse(jsonString);
-        } catch (ParseException ex) {
+            symbol = (String) jsonObject.get("symbol");
+        } catch (Throwable ex) {
         }
-        Map<String, QuoteList> quoteMap = QuoteHandler.INSTANCE.retreiveCurrentQuote(true, symbols.split(","));
 
-        //test commit from netbeans
+        String cleanSymbol = symbol.split(",")[0].trim().toUpperCase();
+        lastPoll = lastPollTime.get(cleanSymbol) != null ? lastPollTime.get(cleanSymbol) : 0;
+        lastQuote = lastPollData.get(cleanSymbol) != null ? lastPollData.get(cleanSymbol) : new QuoteBean("", "", 0.0, "0");
+
+        try {
+            if (System.currentTimeMillis() - lastPoll > 10000) {
+                lastQuote = QuoteHandler.INSTANCE.retrieveRobinhoodQuote(cleanSymbol);
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                System.out.println("- Submitting web request to Robinhoodd: " + symbol);
+                lastPoll = System.currentTimeMillis();
+                lastPollTime.put(cleanSymbol, lastPoll);
+                lastPollData.put(cleanSymbol, lastQuote);
+                System.out.println("-   This Submit: " + sdf.format(new Date(lastPoll)));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(PracticeServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         JSONArray quoteArray = new JSONArray();
-
-        quoteMap.values().stream().forEach((quoteList) -> {
-            quoteArray.add(quoteList.toString().toUpperCase());
-        });
-
+        quoteArray.add(lastQuote.toString());
         returnJson.put("count", quoteArray.size());
         returnJson.put("quoteInfo", quoteArray);
         response.setContentType("application/JSON");

@@ -136,16 +136,17 @@ $(document).ready(function () {
             var port;
             var portID;
             var vpData = TileHandler.VIEWPORT_HANDLING.VIEWPORT_DATA;
-            var lastPosition = 0;
+            var lastPosition = 75;
             $('.viewport-tile-marker').each(function () {
                 port = $(this);
                 portID = TileHandler.generateID('view');
                 vpData[portID] = {
+                    portID: portID,
                     inUse: false
                 };
                 port.attr('id', portID);
-                lastPosition += 170;
-                TileHandler.VIEWPORT_HANDLING.setViewportPosition(portID, lastPosition);
+                TileHandler.VIEWPORT_HANDLING.setViewportPosition(portID, 15, lastPosition);
+                lastPosition += 210;
             });
         }
     };
@@ -228,47 +229,98 @@ $(document).ready(function () {
         sup2: {test1: "DATA1", test3: "Data3"},
         sup3: {test1: "DATA1", test3: "Data3"}
     };
+
+
+    var pollStockInfoSuccess = function (data, doMe) {
+        var printStr = "";
+        var symbol;
+        var quoteInfo = data.quoteInfo;
+        if (quoteInfo) {
+            for (var i = 0; i < quoteInfo.length; i++) {
+                if (quoteInfo[i]) {
+                    symbol = quoteInfo[i].split("- ");
+                    printStr += "<div id=\"" + symbol[0].trim() + "\">";
+                    printStr += symbol[0] + symbol[1] + symbol[2];
+                    printStr += "</div>";
+                    printStr += "<div>";
+                    printStr += "Sent to server: " + $(doMe).val();
+                    printStr += "</div>";
+                }
+            }
+            $(doMe).siblings(".stockInfoResults").html(printStr);
+        }
+    };
+
     var pollStockInfo = function (doMe) {
         if (!doMe) {
             $(".symbol").each(function () {
                 console.log(this);
                 pollStockInfo(this);
+
             });
         }
+        var payload = {
+            symbol: $(doMe).val()
+        };
+        defaultAJAX("GET_SINGLE_QUOTE", payload, pollStockInfoSuccess, doMe);
+//        $.ajax({
+//            url: "PracticeServlet",
+//            type: "POST",
+//            dataType: "JSON",
+//            data: {
+//                action: "ANOTHER_ACTION",
+//                symbol: $(doMe).val(),
+//                lastName: JSON.stringify(test)
+//            },
+//            success: function (data) {
+//                var printStr = "";
+//                var symbol;
+//                var quoteInfo = data.quoteInfo;
+//                if (quoteInfo) {
+//                    for (var i = 0; i < quoteInfo.length; i++) {
+//                        if (quoteInfo[i]) {
+//                            symbol = quoteInfo[i].split("- ");
+//                            printStr += "<div id=\"" + symbol[0].trim() + "\">";
+//                            printStr += symbol[0] + symbol[1] + symbol[2];
+//                            printStr += "</div>";
+//                            printStr += "<div>";
+//                            printStr += "Sent to server: " + $(doMe).val();
+//                            printStr += "</div>";
+//                        }
+//                    }
+//                    $(doMe).siblings(".stockInfoResults").html(printStr);
+//                }
+//            },
+//            error: function (data, status, er) {
+////                alert("error: " + data + " status: " + status + " er:" + er);
+//            }
+//        });
+        return false;
+    };
+
+
+
+
+    var defaultAJAX = function (action, payloadIn, successFunc, callingID) {
         $.ajax({
             url: "PracticeServlet",
             type: "POST",
             dataType: "JSON",
             data: {
-                action: "AnotherAction",
-                symbol: $(doMe).val(),
-                lastName: JSON.stringify(test)
+                action: action,
+                payload: JSON.stringify(payloadIn)
             },
             success: function (data) {
-                var printStr = "";
-                var symbol;
-                var quoteInfo = data.quoteInfo;
-                if (quoteInfo) {
-                    for (var i = 0; i < quoteInfo.length; i++) {
-                        if (quoteInfo[i]) {
-                            symbol = quoteInfo[i].split("- ");
-                            printStr += "<div id=\"" + symbol[0].trim() + "\">";
-                            printStr += symbol[0] + symbol[1] + symbol[2];
-                            printStr += "</div>";
-                            printStr += "<div>";
-                            printStr += "Sent to server: " + $(doMe).val();
-                            printStr += "</div>";
-                        }
-                    }
-                    $(doMe).siblings(".stockInfoResults").html(printStr);
-                }
+                successFunc(data, callingID);
             },
             error: function (data, status, er) {
 //                alert("error: " + data + " status: " + status + " er:" + er);
             }
         });
-        return false;
     };
+
+
+
     var openFullItem = function () {
         $(this).parent().parent().parent().parent().parent().toggleClass('observer-item-open');
     };

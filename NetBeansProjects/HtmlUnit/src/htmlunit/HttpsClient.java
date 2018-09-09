@@ -25,9 +25,9 @@ public enum HttpsClient {
             "https://api.robinhood.com/");
 
     //Set these in properties file.
-    public static final String JDK_1_8_92__CLIENTKEYSTORE 
+    public static final String JDK_1_8_92__CLIENTKEYSTORE
             = "C:\\Program Files\\Java\\jdk1.8.0_92\\jre\\bin\\clientkeystore";
-    public static final String JDK_1_8_144__CACERTS 
+    public static final String JDK_1_8_144__CACERTS
             = "C:\\Program Files (x86)\\Java\\jre1.8.0_144\\lib\\security\\cacerts";
     private static JSONParser jsonParser = new JSONParser();
     private Path truststorePath;
@@ -71,6 +71,7 @@ public enum HttpsClient {
         String responseString = "";
         try {
             URL toSend = new URL(this.baseURL.toString() + reqURL);
+            System.out.println(toSend.toString());
 
             HttpsURLConnection con = (HttpsURLConnection) toSend.openConnection();
 

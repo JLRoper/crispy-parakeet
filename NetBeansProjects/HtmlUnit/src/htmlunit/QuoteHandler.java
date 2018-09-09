@@ -109,7 +109,7 @@ public enum QuoteHandler {
         return new QuoteBean(
                 (String) curData.get("symbol"),
                 (String) curData.get("updated_at"),
-                Double.parseDouble(((String) curData.get("last_extended_hours_trade_price")).replace("\"", "")),
+                Double.parseDouble(((String) curData.get("last_trade_price")).replace("\"", "")),
                 "volume");
     }
 
