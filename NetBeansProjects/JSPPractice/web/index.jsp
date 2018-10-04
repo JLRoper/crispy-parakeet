@@ -10,7 +10,7 @@
 <!--<script src="owlcarousel/owl.carousel.min.js"></script>-->
 <script src="js/jquery-3.2.1.min.js"></script>
 
-<!--<link rel="stylesheet"  type="text/css" href="style/mystyle.css">-->
+<!--<link rel="stylesheet,jnh"  type="text/css" href="style/mystyle.css">-->
 <link rel="stylesheet" type="text/css" href="style/index.css">
 <!--<link rel="stylesheet" href="owlcarousel/assets/owl.carousel.css">-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
