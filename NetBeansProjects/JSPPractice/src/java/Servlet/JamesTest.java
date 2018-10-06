@@ -15,12 +15,14 @@ import javax.swing.plaf.basic.BasicArrowButton;
  */
 public class JamesTest {
 
-    public static void main(String args[]) {
-    JFrame framePanel = new JFrame();
-    framePanel.setVisible(true);
+    public static String myName = "TEstname";
 
-    Component comp = new BasicArrowButton(3);
-    framePanel.setComponentZOrder(comp, 0);
+    public static void main(String args[]) {
+        JFrame framePanel = new JFrame();
+        framePanel.setVisible(true);
+
+        Component comp = new BasicArrowButton(3);
+//        framePanel.setComponentZOrder(comp, 0);
 
     }
 }
