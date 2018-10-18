@@ -15,9 +15,12 @@
     <head>
         <!--<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">-->
         <title>JSP jameesssssPage</title>
+        <% String javaString = " sdfsdf"; %>
+        
     </head>
     <body>
         <h1>Hello test World!</h1>
+        <div id="">This is a terst</div>
     </body>
 </html>
 
