@@ -117,7 +117,7 @@ public class PracticeServlet extends HttpServlet {
         JSONObject jsonObject = null;
         JSONObject returnJson = new JSONObject();
         String jsonString = request.getParameter("payload");
-        String symbol = "";
+        String symbol = ""; 
         JSONParser parser = new JSONParser();
         try {
             jsonObject = (JSONObject) parser.parse(jsonString);
